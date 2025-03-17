@@ -1,12 +1,17 @@
 # 기본 라이브러리
 import time # 크롤링 시 페이지 로딩을 기다리기 위해 사용
 
+# 인코딩 문제를 해결하기 위한 코드
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 # Seleniu 관련 모듈
 from selenium.webdriver.common.by import By # 웹 요소를 선택할 때 사용 (CSS Selector 등)
 
 # 프로젝트 내 모듈
 from modules.webdriver import create_webdriver # Selenium WebDriver를 생성하는 함수
 from data.config import CATEGORY_URLS # 뉴스 카테고리별 URL을 설정한 설정 파일
+from modules.json_save import json_save
 from modules.extractor import ( # 데이터 추출 함수 (크롤링한 웹페이지에서 특정 데이터를 추출)
     extract_news_title, # 뉴스 제목
     extract_news_content, # 뉴스 본문 내용 추출
@@ -50,13 +55,13 @@ def crawl_all_news_links(
             total_news_cnt += secondary_category_news_cnt # 전체 뉴스 개수 업데이트
 
             # 뉴스 크롤링 완료 메시지 출력
-            print(f"✅ {primary_category} > {secondary_category} 뉴스 {secondary_category_news_cnt}개 크롤링 완료!") 
+            print(f" {primary_category} > {secondary_category} 뉴스 {secondary_category_news_cnt}개 크롤링 완료!") 
 
         # 특정 1차 카테고리에 해당하는 뉴스 개수 출력
-        print(f"\n📊 {primary_category} 카테고리 총 {primary_category_news_cnt}개 크롤링 완료!\n" + "=" * 60)
+        print(f"\n {primary_category} 카테고리 총 {primary_category_news_cnt}개 크롤링 완료!\n" + "=" * 60)
 
     # 전체 뉴스 개수 출력
-    print(f"\n🎯 총 {total_news_cnt}개의 뉴스 링크 크롤링 완료!\n" + "=" * 60)
+    print(f"\n 총 {total_news_cnt}개의 뉴스 링크 크롤링 완료!\n" + "=" * 60)
 
     return all_news_links # 크롤링된 뉴스 링크 딕셔너리 반환
 
@@ -67,7 +72,7 @@ def crawl_headline_news_links(
 ):
     # 주어진 1차 카테고리가 CATEGORY_URLS에 존재하는지 확인
     if primary_category not in CATEGORY_URLS:
-        print(f"❌ {primary_category} 카테고리는 존재하지 않습니다.")
+        print(f" {primary_category} 카테고리는 존재하지 않습니다.")
         return []
     
     driver = create_webdriver() # 웹 드라이버 생성
@@ -75,7 +80,7 @@ def crawl_headline_news_links(
     
     try:
         category_url = CATEGORY_URLS[primary_category]["메인"] # 해당 1차 카테고리의 "메인" URL 가져오기
-        print(f"🔍 {primary_category} 헤드라인 뉴스 크롤링 중...") 
+        print(f" {primary_category} 헤드라인 뉴스 크롤링 중...") 
         driver.get(category_url) # 페이지 이동
         time.sleep(3) # 페이지 로딩 대기
         
@@ -119,7 +124,7 @@ def crawl_multiple_news_details(news_urls):
             all_news_details.append(news) # 뉴스 정보 리스트에 추가
             
     except Exception as e:
-        print(f"❌ 오류 발생: {e}") # 오류 발생 시 메시지 출력
+        print(f" 오류 발생: {e}") # 오류 발생 시 메시지 출력
     finally:
         driver.quit() # 웹 드라이버 종료
 
@@ -133,8 +138,10 @@ if __name__ == "__main__":
     # 2. 크롤링한 뉴스 링크들을 이용해 뉴스 상세 정보 가져오기
     all_links = [link for links in news_links.values() for link in links] # 크롤링된 모든 뉴스 링크를 리스트로 반환
     if all_links: # 크롤링된 뉴스 링크가 비어있지 않은 경우
-        print("\n📰 뉴스 기사 상세 정보 크롤링 중...")
+        print("\n 뉴스 기사 상세 정보 크롤링 중...")
         news_details = crawl_multiple_news_details(all_links) # 뉴스 상세 정보 크롤링 수행
         print_news_details(news_details) # 크롤링된 뉴스 기사 정보를 출력
+        json_save(news_details) # 크롤링 한 뉴스 기사를 json으로 변환하여 저장
+        
     else: # 크롤링된 뉴스 링크가 없을 경우 경고 메시지 출력
-        print("⚠️ 크롤링된 뉴스 링크가 없습니다.")
+        print(" 크롤링된 뉴스 링크가 없습니다.")
