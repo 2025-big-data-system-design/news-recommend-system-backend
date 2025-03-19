@@ -1,5 +1,6 @@
 # 기본 라이브러리
 import re # 정규 표현식을 사용하여 텍스트 전처리 수행
+import os, sys, json
 
 # 텍스트 처리 및 머신러닝 모듈
 from sklearn.feature_extraction.text import TfidfVectorizer # TfidVectorization: TF-IDF 벡터화를 수행하여 키워드 추출
@@ -7,9 +8,25 @@ from sklearn.feature_extraction.text import TfidfVectorizer # TfidVectorization:
 # 한글 형태소 분석 모듈
 from konlpy.tag import Okt # 한글 형태소 분석기 (명사 추출 수행)
 
+# 현재 파일 기준으로 data 폴더의 절대 경로를 추가
+current_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일이 위치한 디렉토리
+parent_dir = os.path.dirname(current_dir)  # 상위 디렉토리 (프로젝트 루트)
+data_path = os.path.join(parent_dir, "data")  # data 폴더 경로
+model_path = os.path.join(parent_dir, "models") # model 폴더 경로로
+json_path = os.path.join(parent_dir, "json", "news_data.json")  # JSON 파일 경로
+
+sys.path.append(data_path)  # data 폴더를 Python 모듈 검색 경로에 추가
+sys.path.append(model_path) # model 폴더를 aPython 모듈 검색 경로에 추가
+
 # 프로젝트 내 데이터 모듈
-from data.sample_news import sample_news  # 샘플 뉴스 객체 가져오기
-from data.stopwords import STOPWORDS  # 불용어 리스트 불러오기
+from sample_news import sample_news  # 샘플 뉴스 객체 가져오기
+from stopwords import STOPWORDS  # 불용어 리스트 불러오기
+
+# JSON 파일 로드 함수
+def load_json(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)  # JSON 파일을 파이썬 객체로 변환
+    return data
 
 # 한글 형태소 분석기 객체 생성
 okt = Okt()
@@ -48,8 +65,18 @@ def extract_keywords(
     return keywords # 중요 키워드 리스트 반환
 
 # 샘플 뉴스 본문에서 키워드 추출
-keywords = extract_keywords(sample_news.content, top_n=10)
+# keywords = extract_keywords(sample_news.content, top_n=10)
 
-# 결과 출력
-print("🔥 중요 키워드 (TF-IDF 기준 상위 10개):")
-print(keywords)
+# # 결과 출력
+# print("🔥 중요 키워드 (TF-IDF 기준 상위 10개):")
+# print(keywords)
+
+# JSON 파일 불러오기
+news_data = load_json(json_path)
+
+# 각 뉴스 기사에서 중요 키워드 추출 (최대 5개 뉴스만 테스트)
+for i, doc in enumerate(news_data):
+    keywords = extract_keywords(doc["content"], top_n=15)
+    print(f"\n🔥 뉴스 중요 키워드드 {i+1} 키워드: {keywords}")
+
+

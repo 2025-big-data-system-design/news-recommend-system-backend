@@ -1,5 +1,5 @@
 # 데이터 모델 모듈
-from models.news import News # 크롤링한 뉴스 정보를 객체로 관리하는 클래스
+from news import News # 크롤링한 뉴스 정보를 객체로 관리하는 클래스
 
 # 샘플 뉴스 기사 본문
 sample_article = """
