@@ -9,6 +9,8 @@ from data.stopwords import STOPWORDS
 # 한글 형태소 분석 모듈
 from konlpy.tag import Okt # 한글 형태소 분석기 (명사 추출 수행)
 
+from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
+
 # 한글 형태소 분석기 객체 생성
 okt = Okt()
 
@@ -44,3 +46,24 @@ def extract_keywords(
     keywords = [word for word, score in keyword_scores[:top_n]]
 
     return keywords # 중요 키워드 리스트 반환
+
+def summarize_news(text, max_length=512, summary_length=100):
+    # KoBART 모델 로드
+    tokenizer = PreTrainedTokenizerFast.from_pretrained("digit82/kobart-summarization")
+    model = BartForConditionalGeneration.from_pretrained("digit82/kobart-summarization")
+    
+    # 입력 텍스트 토큰화
+    inputs = tokenizer([text], max_length=max_length, return_tensors="pt", truncation=True)
+
+    # 요약 생성
+    summary_ids = model.generate(
+        inputs["input_ids"],
+        max_length=summary_length,
+        min_length=30,
+        length_penalty=2.0,
+        num_beams=4,
+        early_stopping=True
+    )
+
+    # 디코딩하여 텍스트로 반환
+    return tokenizer.decode(summary_ids[0], skip_special_tokens=True)

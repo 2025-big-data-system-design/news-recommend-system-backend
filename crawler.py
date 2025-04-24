@@ -22,7 +22,8 @@ from modules.extractor import ( # 데이터 추출 함수 (크롤링한 웹페�
     extract_categories
 )
 from modules.summarizer import (
-    extract_keywords
+    extract_keywords,
+    summarize_news
 )
 
 # 데이터 모델 모듈
@@ -33,6 +34,8 @@ from modules.printer import (
     print_news_details, # 크롤링한 뉴스 링크 목록 출력
     print_news_links # 크롤링한 뉴스 기사 상세 정보 출력 
 )
+
+from modules.mongodb_server import save_to_mongodb
 
 def crawl_all_news_links(
     max_links=30 # 각 카테고리별 최대 크롤링할 뉴스 링크 개수
@@ -140,6 +143,11 @@ def crawl_multiple_news_details(news_urls):
                 categories=categories,
                 keywords=keywords
             )
+            
+            # 요약문이 없을 경우 자동 요약
+            if not news_summary or news_summary.strip() == "요약 없음":
+                news_summary = summarize_news(news_content["text"])
+                
             all_news_details.append(news) # 뉴스 정보 리스트에 추가
             
     except Exception as e:
@@ -160,6 +168,9 @@ if __name__ == "__main__":
         print("\n 뉴스 기사 상세 정보 크롤링 중...")
         news_details = crawl_multiple_news_details(all_links) # 뉴스 상세 정보 크롤링 수행
         print_news_details(news_details) # 크롤링된 뉴스 기사 정보를 출력
+        
+        print("\n MongoDB 저장 중...")
+        save_to_mongodb(news_details)
         
     else: # 크롤링된 뉴스 링크가 없을 경우 경고 메시지 출력
         print(" 크롤링된 뉴스 링크가 없습니다.")
