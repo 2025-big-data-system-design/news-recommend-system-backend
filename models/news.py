@@ -9,7 +9,8 @@ class News:
         reporter: dict,         # name, email, profile_image
         thumbnail: str,
         published_at,           # datetime 형식
-        categories: list        # 문자열 리스트
+        categories: list,       # 문자열 리스트
+        keywords: list = None   # 중요 키워드 리스트 (선택적, 기본은 빈 리스트)
     ):
         self.url = url
         self.title = title
@@ -20,6 +21,7 @@ class News:
         self.thumbnail = thumbnail
         self.published_at = published_at
         self.categories = categories
+        self.keywords = keywords if keywords else []
 
     def __repr__(self):
         return (
@@ -38,5 +40,6 @@ class News:
             "reporter": self.reporter,
             "thumbnail": self.thumbnail,
             "published_at": self.published_at,
-            "categories": self.categories
+            "categories": self.categories,
+            "keywords": self.keywords
         }

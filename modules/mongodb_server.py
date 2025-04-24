@@ -3,7 +3,7 @@ from pymongo import MongoClient # MongoDB 클라이언트 객체 생성용 impor
 
 # MongoDB 초기화
 mongo_client = MongoClient("mongodb://localhost:27017/") # MongoDB 클라이언트 생성 (로컬 MongoDB 서버에 연결)
-mongo_db = mongo_client["news_crawler_db"] # 사용할 데이터베이스 선택 (news_crawler_db가 없으면 자동으로 생성)
+mongo_db = mongo_client["rappit_news_db"] # 사용할 데이터베이스 선택 (news_crawler_db가 없으면 자동으로 생성)
 news_collection = mongo_db["news_articles"] # 사용할 컬렉션 선택 (news_article가 없으면 자동으로 생성)
 
 # MongoDB에 저장하는 함수 (중복 URL 방지, to_dict() 사용)

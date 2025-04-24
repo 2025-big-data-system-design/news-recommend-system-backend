@@ -5,7 +5,7 @@ import time # 크롤링 시 페이지 로딩을 기다리기 위해 사용
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
-# Seleniu 관련 모듈
+# Selenium 관련 모듈
 from selenium.webdriver.common.by import By # 웹 요소를 선택할 때 사용 (CSS Selector 등)
 
 # 프로젝트 내 모듈
@@ -20,6 +20,9 @@ from modules.extractor import ( # 데이터 추출 함수 (크롤링한 웹페�
     extract_thumbnail,
     extract_news_date,
     extract_categories
+)
+from modules.summarizer import (
+    extract_keywords
 )
 
 # 데이터 모델 모듈
@@ -122,6 +125,8 @@ def crawl_multiple_news_details(news_urls):
             thumbnail = extract_thumbnail(driver)              # 썸네일 이미지 URL 추출
             categories = extract_categories(driver)            # 카테고리 태그 추출
             
+            keywords = extract_keywords(news_content["text"], top_n=5)
+            
             # 크롤링한 데이터를 기반으로 News 객체 생성
             news = News(
                 url=url,
@@ -132,7 +137,8 @@ def crawl_multiple_news_details(news_urls):
                 reporter=reporter_info,
                 thumbnail=thumbnail,
                 published_at=news_date,
-                categories=categories
+                categories=categories,
+                keywords=keywords
             )
             all_news_details.append(news) # 뉴스 정보 리스트에 추가
             

@@ -31,6 +31,7 @@ def print_news_details(news_list):
         print(f"📅 발행일: {news.published_at}")            # 발행 날짜 출력
         print(f"🖼️ 썸네일 이미지: {news.thumbnail}")        # 썸네일 이미지 출력
         print(f"🏷️ 카테고리: {', '.join(news.categories)}")  # 카테고리 출력
+        print(f"🔑 키워드: {', '.join(news.keywords)}") # 키워드 출력
         print("=" * 60 + "\n")
 
     print("\n🎉 모든 뉴스 기사 정보 크롤링 완료!")  # 완료 메시지 출력
