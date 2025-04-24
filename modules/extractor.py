@@ -1,13 +1,24 @@
+# Selenium 관련 모듈
+from selenium.webdriver.common.by import By # 웹 요소를 CSS Selector 등으로 선택할 때 사용
 
-from selenium.webdriver.common.by import By
-import re
+# 정규 표현식 관련 모듈
+import re # 이메일 등 텍스트에서 패턴 기반 추출을 위해 사용
 
 # 주어진 CSS 선택자로 요소의 텍스트를 추출
-def extract_element_text(driver, selector, default="값 없음"):
+def extract_element_text(
+    driver, # Selenium WebDriver 객체
+    selector, # CSS 선택자 문자열 (ex. div.title)
+    default="값 없음" # 요소가 없을 경우 반환할 기본값
+):
     try: 
+        # 해당 selector에 해당하는 요소를 찾기
         element = driver.find_element(By.CSS_SELECTOR, selector)
+        
+        # 요소가 존재하면 텍스트를 반환, 없으면 기본값 반환
         return element.text if element else default
+    
     except Exception:
+        # 예외 발생시 (요소 없음, DOM 접근 오류 등) 기본값 반환
         return default
     
 # 주어진 CSS 선택자로 요소의 특정 속성을 추출

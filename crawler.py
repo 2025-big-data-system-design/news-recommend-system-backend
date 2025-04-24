@@ -11,19 +11,19 @@ from selenium.webdriver.common.by import By # 웹 요소를 선택할 때 사용
 # 프로젝트 내 모듈
 from modules.webdriver import create_webdriver # Selenium WebDriver를 생성하는 함수
 from data.config import CATEGORY_URLS # 뉴스 카테고리별 URL을 설정한 설정 파일
-from modules.extractor import ( # 데이터 추출 함수 (크롤링한 웹페이지에서 특정 데이터를 추출)
-    extract_news_title,
-    extract_news_summary,
-    extract_news_content,
-    extract_press_info,
-    extract_reporter_info,
-    extract_thumbnail,
-    extract_news_date,
-    extract_categories
+from modules.extractor import ( # 웹페이지에서 뉴스 데이터 추출에 사용하는 모듈
+    extract_news_title, # 뉴스 제목 추출
+    extract_news_summary, # 뉴스 요약문 추출
+    extract_news_content, # 뉴스 본문 (HTML, 텍스트, 문단 리스트 등 포함) 추출
+    extract_press_info, # 언론사 정보 (이름, 로고) 추출
+    extract_reporter_info, # 기자 정보 (이름, 이메일, 프로필 이미지) 추출
+    extract_thumbnail, # 썸네일 이미지 URL 추출
+    extract_news_date, # 뉴스 발행일 추출
+    extract_categories # 뉴스 카테고리(섹션) 추출
 )
-from modules.summarizer import (
-    extract_keywords,
-    summarize_news
+from modules.summarizer import ( # 텍스트 요약 및 키워드 추출에 사용하는 모듈
+    extract_keywords, # TF-IDF 기반 중요 키워드 추출
+    summarize_news # KoBART 기반 뉴스 본문 자동 요약
 )
 
 # 데이터 모델 모듈
@@ -35,7 +35,8 @@ from modules.printer import (
     print_news_links # 크롤링한 뉴스 기사 상세 정보 출력 
 )
 
-from modules.mongodb_server import save_to_mongodb
+# MongoDB 저장 모듈 (뉴스 데이터를 데이터베이스에 저장)
+from modules.mongodb_server import save_to_mongodb # 크롤링한 뉴스 리스트를 MongoDB에 저장하는 함수
 
 def crawl_all_news_links(
     max_links=30 # 각 카테고리별 최대 크롤링할 뉴스 링크 개수
@@ -119,33 +120,33 @@ def crawl_multiple_news_details(news_urls):
             driver.get(url) # 해당 뉴스 페이지로 이동
             
             # 뉴스 기사 주요 정보 추출
-            news_title = extract_news_title(driver)            # 제목 추출
-            news_summary = extract_news_summary(driver)        # 요약문(리드) 추출    
-            news_content = extract_news_content(driver)        # 본문 (html/text/paragraphs 포함) 추출
-            press_info = extract_press_info(driver)            # 언론사 정보 (이름/로고)
-            reporter_info = extract_reporter_info(driver)      # 기자 정보 (이름/이메일/프로필)
-            news_date = extract_news_date(driver)              # 뉴스 발행 날짜 추출
-            thumbnail = extract_thumbnail(driver)              # 썸네일 이미지 URL 추출
-            categories = extract_categories(driver)            # 카테고리 태그 추출
+            news_title = extract_news_title(driver) # 제목 추출
+            news_summary = extract_news_summary(driver) # 요약문(리드) 추출    
+            news_content = extract_news_content(driver) # 본문 (html/text/paragraphs 포함) 추출
+            press_info = extract_press_info(driver) # 언론사 정보 (이름/로고)
+            reporter_info = extract_reporter_info(driver) # 기자 정보 (이름/이메일/프로필)
+            news_date = extract_news_date(driver) # 뉴스 발행 날짜 추출
+            thumbnail = extract_thumbnail(driver) # 썸네일 이미지 URL 추출
+            categories = extract_categories(driver) # 카테고리 태그 추출
             
-            keywords = extract_keywords(news_content["text"], top_n=5)
+            keywords = extract_keywords(news_content["text"], top_n=5) # 중요 키워드 추출 (TF-IDF 기반 상위 5개)
             
-            # 요약문이 없을 경우 자동 요약
+            # 요약문이 없을 경우 KoBART를 이용하여 자동 요약 수행
             if not news_summary or news_summary.strip() == "요약 없음":
                 news_summary = summarize_news(news_content["text"])
                 
             # 크롤링한 데이터를 기반으로 News 객체 생성
             news = News(
-                url=url,
-                title=news_title,
-                summary=news_summary,
-                content=news_content,
-                press=press_info,
-                reporter=reporter_info,
-                thumbnail=thumbnail,
-                published_at=news_date,
-                categories=categories,
-                keywords=keywords
+                url=url, # 뉴스 기사 URL
+                title=news_title, # 기사 제목
+                summary=news_summary, # 요약문 
+                content=news_content, # 본문 정보 (HTML, 텍스트, 문단, 개체명 포함)
+                press=press_info, # 언론사 정보 (이름, 로고)
+                reporter=reporter_info, # 기자 정보 (이름, 이메일, 프로필)
+                thumbnail=thumbnail, # 대표 이미지 (썸네일)
+                published_at=news_date, # 발행 날짜
+                categories=categories, # 기사에 태그된 카테고리 목록
+                keywords=keywords # 중요 키워드 리스트
             )
             
             all_news_details.append(news) # 뉴스 정보 리스트에 추가
@@ -169,8 +170,9 @@ if __name__ == "__main__":
         news_details = crawl_multiple_news_details(all_links) # 뉴스 상세 정보 크롤링 수행
         print_news_details(news_details) # 크롤링된 뉴스 기사 정보를 출력
         
-        print("\n MongoDB 저장 중...")
-        save_to_mongodb(news_details)
+        # 3. 최종적으로 크롤링한 뉴스 기사 정보를 MongoDB에 저장
+        print("\n MongoDB 저장 중...") # MongoDB 저장 중 메시지 출력
+        save_to_mongodb(news_details) # 인덱스가 적용된 컬렉션, 적용되지 않은 컬렉션 두 개로 나누어 DB에 저장
         
     else: # 크롤링된 뉴스 링크가 없을 경우 경고 메시지 출력
         print(" 크롤링된 뉴스 링크가 없습니다.")
