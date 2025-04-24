@@ -120,7 +120,7 @@ def crawl_multiple_news_details(news_urls):
             
             # 뉴스 기사 주요 정보 추출
             news_title = extract_news_title(driver)            # 제목 추출
-            news_summary = extract_news_summary(driver)        # 요약문(리드) 추출
+            news_summary = extract_news_summary(driver)        # 요약문(리드) 추출    
             news_content = extract_news_content(driver)        # 본문 (html/text/paragraphs 포함) 추출
             press_info = extract_press_info(driver)            # 언론사 정보 (이름/로고)
             reporter_info = extract_reporter_info(driver)      # 기자 정보 (이름/이메일/프로필)
@@ -130,6 +130,10 @@ def crawl_multiple_news_details(news_urls):
             
             keywords = extract_keywords(news_content["text"], top_n=5)
             
+            # 요약문이 없을 경우 자동 요약
+            if not news_summary or news_summary.strip() == "요약 없음":
+                news_summary = summarize_news(news_content["text"])
+                
             # 크롤링한 데이터를 기반으로 News 객체 생성
             news = News(
                 url=url,
@@ -144,10 +148,6 @@ def crawl_multiple_news_details(news_urls):
                 keywords=keywords
             )
             
-            # 요약문이 없을 경우 자동 요약
-            if not news_summary or news_summary.strip() == "요약 없음":
-                news_summary = summarize_news(news_content["text"])
-                
             all_news_details.append(news) # 뉴스 정보 리스트에 추가
             
     except Exception as e:
