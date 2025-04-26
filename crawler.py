@@ -160,7 +160,7 @@ def crawl_multiple_news_details(news_urls):
         
 if __name__ == "__main__":
     # 1. 모든 카테고리에서 뉴스 링크 크롤링
-    news_links = crawl_all_news_links(max_links=1) # 각 카테고리별 최대 1개의 뉴스 링크 크롤링 (테스트용)
+    news_links = crawl_all_news_links(max_links=500) # 각 카테고리별 최대 500개의 뉴스 링크 크롤링
     print_news_links(news_links) # 크롤링된 뉴스 링크 목록 출력
 
     # 2. 크롤링한 뉴스 링크들을 이용해 뉴스 상세 정보 가져오기

@@ -26,6 +26,7 @@ def serialize_doc(
     return doc # 변환된 문서를 반환
 
 # news_articles_raw 컬렉션의 모든 뉴스 문서를 조회
+# ex) http://localhost:5000/api/news/raw/all
 @app.route("/api/news/raw/all", methods=["GET"])
 def get_all_news_raw():
     start_time = time.time() # API 요청 처리 시작 시간 기록
@@ -46,6 +47,7 @@ def get_all_news_raw():
     })
 
 # news_articles_raw 컬렉션의 뉴스 문서를 페이지 단위로 조회
+# ex) http://localhost:5000/api/news/raw?page=1&size=100
 @app.route("/api/news/raw", methods=["GET"])
 def get_news_raw_by_page():
     try:
@@ -78,6 +80,7 @@ def get_news_raw_by_page():
         return jsonify({"error": "Invalid 'page' or 'size' parameter"}), 400
 
 # news_articles_indexed 컬렉션의 모든 뉴스 문서를 조회
+# ex) http://localhost:5000/api/news/indexed/all
 @app.route("/api/news/indexed/all", methods=["GET"])
 def get_all_news_indexed():
     start_time = time.time() # API 요청 처리시작 시간 기록
@@ -97,6 +100,7 @@ def get_all_news_indexed():
     })
 
 # news_articles_indexed 컬렉션의 뉴스 문서를 페이지 단위로 조회
+# ex) http://localhost:5000/api/news/indexed?page=1&size=100
 @app.route("/api/news/indexed", methods=["GET"])
 def get_news_indexed_by_page():
     try:
@@ -128,6 +132,7 @@ def get_news_indexed_by_page():
         return jsonify({"error": "Invalid 'page' or 'size' parameter"}), 400
 
 # 언론사 이름 필드를 기준으로 각각의 처리 성능 비교
+# ex) http://localhost:5000/api/news/perf/press?name=매일경제
 @app.route("/api/news/perf/press", methods=["GET"])
 def compare_press_query_perf():
     # 요청 쿼리 파라미터에서 언론사명(name)을 가져옴

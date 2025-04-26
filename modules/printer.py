@@ -22,7 +22,6 @@ def print_news_details(news_list):
         print(f"📝 요약문: {news.summary}")                 # 뉴스 요약 출력
         print(f"📜 본문 내용 일부: {news.content['text'][:60]}...")  # 본문 텍스트 일부 출력
         print(f"🔠 문단 수: {len(news.content['paragraphs'])}")     # 문단 수 출력
-        print(f"🔎 개체명 수: {len(news.content['entities'])}")     # 개체명 수 출력
         print(f"🏢 언론사: {news.press['name']}")           # 언론사 이름 출력
         print(f"🖼️ 로고: {news.press['logo']}")            # 언론사 로고 출력
         print(f"🧑 기자: {news.reporter['name']}")          # 기자 이름 출력
