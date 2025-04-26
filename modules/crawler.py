@@ -36,7 +36,7 @@ from modules.printer import (
 )
 
 # MongoDB 저장 모듈 (뉴스 데이터를 데이터베이스에 저장)
-from modules.mongodb_server import save_to_mongodb # 크롤링한 뉴스 리스트를 MongoDB에 저장하는 함수
+from modules.mongodb_utils import save_to_mongodb # 크롤링한 뉴스 리스트를 MongoDB에 저장하는 함수
 
 def crawl_all_news_links(
     max_links=30 # 각 카테고리별 최대 크롤링할 뉴스 링크 개수
